@@ -1,6 +1,7 @@
 import express from "express"
 import { MongoClient } from "mongodb";
 import dotenv from 'dotenv';
+import cors from 'cors';
 dotenv.config();
 const app=express();
 
@@ -14,7 +15,7 @@ const movies=[{"id":"100","name":"Iron man 2","poster":"https://m.media-amazon.c
 const PORT=process.env.PORT;
 
 app.use(express.json());
-
+app.use(cors())
 // const MONGODB_URL="mongodb://localhost";  //server where mongoDB connects
 const MONGO_URL=(process.env.MONGO_URL);
 async function Createconnection(){
@@ -30,9 +31,9 @@ app.get("/",function(request,response){
 })
 
 // local data movies
-app.get("/movies",function(request,response){
-    response.send(movies);
-});
+// app.get("/movies",function(request,response){
+//     response.send(movies);
+// });
 
 // getting movies data from mongoDB database
 app.get("/movies/:id",async function(request,response){
@@ -44,19 +45,19 @@ app.get("/movies/:id",async function(request,response){
 });
 
 // Find movies data in mongoDB
-app.get("/find",async function(request,response){
+app.get("/movies",async function(request,response){
     const find=await client.db("b30wd").collection("movies").find({}).toArray()
     response.send(find)
 });
 
 // Delete all movies in mongoDB 
-app.delete("/movie/delete",async function(request,response){
+app.delete("/movies/delete",async function(request,response){
     const del=await client.db("b30wd").collection("movies").deleteMany({})
     response.send(del)
 });
 
 // Delete one movie in mongoDB 
-app.delete("/movie/:id",async function(request,response){
+app.delete("/movies/:id",async function(request,response){
     console.log(request.params);
     const {id}= request.params;
     const delone=await client.db("b30wd").collection("movies").deleteOne({id:id})
@@ -64,7 +65,7 @@ app.delete("/movie/:id",async function(request,response){
 });
 
 //  edit movie details in mongoDB 
-app.put("/movie/:id",async function(request,response){
+app.put("/movies/:id",async function(request,response){
     console.log(request.params);
     const {id}= request.params;
     const updateData=request.body;
