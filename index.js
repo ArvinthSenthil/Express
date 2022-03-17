@@ -64,7 +64,7 @@ app.delete("/movies/:id",async function(request,response){
    response.send(delone) 
 });
 
-//  edit movie details in mongoDB 
+//  Edit movie details in mongoDB 
 app.put("/movies/:id",async function(request,response){
     console.log(request.params);
     const {id}= request.params;
