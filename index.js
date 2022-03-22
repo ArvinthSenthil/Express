@@ -2,8 +2,13 @@ import express from "express"
 import { MongoClient } from "mongodb";
 import dotenv from 'dotenv';
 import cors from 'cors';
+import {moviesRouter} from "./routes/movies.js";
+import {usersRouter} from "./routes/users.js";
+
+
 dotenv.config();
 const app=express();
+
 
 const movies=[{"id":"100","name":"Iron man 2","poster":"https://m.media-amazon.com/images/M/MV5BMTM0MDgwNjMyMl5BMl5BanBnXkFtZTcwNTg3NzAzMw@@._V1_FMjpg_UX1000_.jpg","rating":7,"description":"With the world now aware that he is Iron Man, billionaire inventor Tony Stark (Robert Downey Jr.) faces pressure from all sides to share his technology with the military. He is reluctant to divulge the secrets of his armored suit, fearing the information will fall into the wrong hands. With Pepper Potts (Gwyneth Paltrow) and Rhodes (Don Cheadle) by his side, Tony must forge new alliances and confront a powerful new enemy.","trailer":"https://www.youtube.com/embed/wKtcmiifycU"},
 {"id":"101","movie_name":"No Country for Old Men","poster":"https://upload.wikimedia.org/wikipedia/en/8/8b/No_Country_for_Old_Men_poster.jpg","rating":8.1,"description":"A hunter's life takes a drastic turn when he discovers two million dollars while strolling through the aftermath of a drug deal. He is then pursued by a psychopathic killer who wants the money.","trailer":"https://www.youtube.com/embed/38A__WT3-o0"},
@@ -14,8 +19,8 @@ const movies=[{"id":"100","name":"Iron man 2","poster":"https://m.media-amazon.c
 {"id":"106","movie_name":"Ratatouille","poster":"https://resizing.flixster.com/gL_JpWcD7sNHNYSwI1ff069Yyug=/ems.ZW1zLXByZC1hc3NldHMvbW92aWVzLzc4ZmJhZjZiLTEzNWMtNDIwOC1hYzU1LTgwZjE3ZjQzNTdiNy5qcGc=","rating":8,"description":"Remy, a rat, aspires to become a renowned French chef. However, he fails to realise that people despise rodents and will never enjoy a meal cooked by him.","trailer":"https://www.youtube.com/embed/NgsQ8mVkN8w"}];
 const PORT=process.env.PORT;
 
-app.use(express.json());
-app.use(cors())
+app.use(express.json());//inbuilt middleware
+app.use(cors())// 3rd party middleware
 // const MONGODB_URL="mongodb://localhost";  //server where mongoDB connects
 const MONGO_URL=(process.env.MONGO_URL);
 async function Createconnection(){
@@ -24,67 +29,18 @@ async function Createconnection(){
    console.log("mongo is connected")
     return client;
 }
-const client=await Createconnection();
+export const client=await Createconnection();
 // Home
 app.get("/",function(request,response){
     response.send("Hello")
 })
 
-// local data movies
-// app.get("/movies",function(request,response){
-//     response.send(movies);
-// });
 
-// getting movies data from mongoDB database
-app.get("/movies/:id",async function(request,response){
-    console.log(request.params);
-    const {id}= request.params;
-    // const movie=movies.find((mv)=>mv.id===id);
-    const movie=await client.db("b30wd").collection("movies").findOne({id:id})
-  movie ? response.send(movie) : response.status(404).send({message:"No such movie found"})
-});
-
-// Find movies data in mongoDB
-app.get("/movies",async function(request,response){
-    const find=await client.db("b30wd").collection("movies").find({}).toArray()
-    response.send(find)
-});
-
-// Delete all movies in mongoDB 
-app.delete("/movies/delete",async function(request,response){
-    const del=await client.db("b30wd").collection("movies").deleteMany({})
-    response.send(del)
-});
-
-// Delete one movie in mongoDB 
-app.delete("/movies/:id",async function(request,response){
-    console.log(request.params);
-    const {id}= request.params;
-    const delone=await client.db("b30wd").collection("movies").deleteOne({id:id})
-   response.send(delone) 
-});
-
-//  Edit movie details in mongoDB 
-app.put("/movies/:id",async function(request,response){
-    console.log(request.params);
-    const {id}= request.params;
-    const updateData=request.body;
-    const edit=await client.db("b30wd").collection("movies").updateOne({id:id},{$set:updateData})
-   response.send(edit) 
-});
-
-
-// Posting data in mongoDB database
-app.post("/movies/post",async function(request,response){
-    const data=request.body;
-    console.log(data);
-const result= await client.db("b30wd").collection("movies").insertMany(data);
-response.send(result);
-    response.send(movies)
-})
-
-
-
-
+app.use('/movies',moviesRouter)
+app.use('/users',usersRouter)
 // To start server at given port
 app.listen(PORT,()=>console.log(`server started in ${PORT}`));
+
+
+
+
