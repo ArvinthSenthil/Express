@@ -21,7 +21,7 @@ router.get("/:id",async function(request,response){
 });
 
 // Find movies data in mongoDB
-router.get("/",auth,async function(request,response){
+router.get("/",async function(request,response){
     const find=await getAllMovies()
     response.send(find)
     
