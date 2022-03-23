@@ -52,7 +52,7 @@ router.put("/:id",async function(request,response){
 
 
 // Posting data in mongoDB database
-router.post("/post",async function(request,response){
+router.post("/",async function(request,response){
     const data=request.body;
     console.log(data);
 const result= await postMovie(data);
